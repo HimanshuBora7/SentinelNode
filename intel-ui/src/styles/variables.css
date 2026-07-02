@@ -1,0 +1,75 @@
+:root {
+  /* ===============================
+       COLORS
+    =============================== */
+
+  --bg-primary: #090c12;
+  --bg-surface: #121822;
+  --bg-elevated: #1a2230;
+
+  --text-primary: #f5f7fa;
+  --text-secondary: #94a3b8;
+
+  --accent: #4f8cff;
+  --success: #2ccb7f;
+  --warning: #f5b942;
+  --danger: #ef4444;
+
+  --border: rgba(255, 255, 255, 0.08);
+
+  --node: #f5f7fa;
+  --connection: #2e3848;
+}
+:root {
+  /* previous variables */
+
+  /* ===============================
+       TYPOGRAPHY
+    =============================== */
+
+  --font-heading: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+}
+:root {
+  /* previous variables */
+
+  /* ===============================
+       SPACING
+    =============================== */
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+}
+:root {
+  /* previous variables */
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+}
+:root {
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.18);
+
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+:root {
+  --transition-fast: 150ms;
+
+  --transition-normal: 250ms;
+
+  --transition-slow: 400ms;
+}

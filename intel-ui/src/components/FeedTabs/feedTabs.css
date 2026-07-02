@@ -1,0 +1,78 @@
+/* ============================================================
+   Feed Tabs — Sticky tab bar below header (mobile-first)
+   ============================================================ */
+
+.feed-tabs {
+  position: sticky;
+  top: 56px;         /* sits right below the header */
+  z-index: 90;
+
+  display: flex;
+  height: 48px;
+
+  background: rgba(9, 12, 18, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Tab Button ── */
+.feed-tabs__item {
+  flex: 1;
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  border: none;
+  outline: none;
+
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+
+  cursor: pointer;
+  transition:
+    color 0.25s ease,
+    background 0.25s ease;
+}
+
+.feed-tabs__item:hover {
+  color: var(--text-primary);
+}
+
+/* Active state */
+.feed-tabs__item.active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Active underline indicator */
+.feed-tabs__item.active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 36px;
+  height: 2px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+/* ── Responsive ── */
+@media (min-width: 640px) {
+  .feed-tabs {
+    top: 64px;       /* match the taller header on tablet+ */
+    height: 52px;
+  }
+
+  .feed-tabs__item {
+    font-size: 0.95rem;
+  }
+}

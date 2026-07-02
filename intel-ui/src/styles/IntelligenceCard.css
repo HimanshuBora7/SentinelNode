@@ -1,0 +1,69 @@
+.intel-card {
+  margin: 16px;
+  padding: 24px;
+
+  background: var(--bg-secondary);
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  border-radius: 16px;
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.intel-card:hover {
+  transform: translateY(-2px);
+
+  border-color: rgba(79, 140, 255, 0.25);
+
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+}
+.intel-card__classification {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.intel-card__category {
+  font-size: 0.72rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
+
+  color: var(--text-secondary);
+}
+.intel-card__level {
+  font-size: 0.72rem;
+
+  padding: 4px 8px;
+
+  border-radius: 999px;
+
+  background: rgba(79, 140, 255, 0.12);
+
+  color: var(--accent);
+
+  font-weight: 600;
+}
+.intel-card__priority {
+  padding: 4px 10px;
+
+  border-radius: 999px;
+
+  background: rgba(79, 140, 255, 0.1);
+
+  color: var(--accent);
+
+  font-size: 0.72rem;
+
+  font-weight: 700;
+}
