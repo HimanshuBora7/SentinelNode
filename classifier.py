@@ -2,116 +2,157 @@ import os
 import sys
 import json
 import psycopg2
+from openai import OpenAI
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types
 
 load_dotenv()
 
-# Initialize the official Google GenAI Client
-# Expects GEMINI_API_KEY to be set in your .env file
-try:
-    client = genai.Client()
-    
-except Exception as e:
-    print(f"❌ Failed to initialize Gemini Client: {e}")
+# OpenRouter Configuration Setup
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+if not OPENROUTER_API_KEY:
+    print("❌ Missing OPENROUTER_API_KEY in environment.")
     sys.exit(1)
-# # Check available models
-# print("🔍 Checking available models...")
-# for m in client.models.list():
-#     if "generateContent" in m.supported_actions:
-#         print(f"✅ Supported model: {m.name}")
+
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=OPENROUTER_API_KEY,
+)
+
+# Configuration settings matching your blueprint
+PRIMARY_MODEL = "deepseek/deepseek-chat" # Toggle to "google/gemini-2.5-flash" or similar via config change
+SCHEMA_VERSION = 1
+
 def get_db_connection():
     return psycopg2.connect(
         dbname=os.getenv("DB_NAME"), user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASS"), host=os.getenv("DB_HOST"), port=os.getenv("DB_PORT")
     )
 
-def process_unclassified_posts():
-    print("🤖 AI Classification Worker booting up...")
-    
+def clean_json_string(raw_string):
+    """Defensively strips markdown code fences or rogue lines before parsing"""
+    cleaned = raw_string.strip()
+    if cleaned.startswith("```json"):
+        cleaned = cleaned[7:]
+    elif cleaned.startswith("```"):
+        cleaned = cleaned[3:]
+    if cleaned.endswith("```"):
+        cleaned = cleaned[:-3]
+    return cleaned.strip()
+
+def pipeline_sweep_batch():
+    print(f"🤖 OpenRouter Intelligence Worker operating via model: {PRIMARY_MODEL}")
     conn = get_db_connection()
     cur = conn.cursor()
     
-    # Fetch a batch of unprocessed text fields
+    # 1. Pull un-extracted target posts from the state machine queue
     cur.execute("""
-        SELECT post_id, account_handle, text, timestamp, post_url 
+        SELECT post_id, account_handle, text 
         FROM raw_posts 
-        WHERE is_processed = FALSE 
+        WHERE status = 'PENDING' 
         LIMIT 10;
     """)
-    unprocessed_rows = cur.fetchall()
+    batch = cur.fetchall()
     
-    if not unprocessed_rows:
-        print("ℹ️ Queue empty. No unclassified posts found.")
+    if not batch:
+        print("ℹ️ Queue clear. No pending records detected.")
         cur.close()
         conn.close()
         return
 
-    print(f"📋 Found {len(unprocessed_rows)} fresh records in the processing queue.")
+    print(f"📦 Locked {len(batch)} items for batch processing loop.")
 
-    # System Instruction guiding the analytical engine
     system_prompt = (
-        "You are a military intelligence watch officer. Analyze the given text payload "
-        "and determine if it contains high-signal information regarding defense, military aviation, "
-        "national security, regional conflicts, strategic infrastructure, or geopolitical defense procurement. "
-        "Classify it strictly into one of two categories:\n"
-        "1. DEFENSE: Directly related to military, strategic security, arms, geopolitical standoffs, or aerospace intelligence.\n"
-        "2. TRIVIAL: Domestic politics, civic news, entertainment, general sports, or casual commentary."
+        "You are an expert military intelligence watch officer. Parse the text payload and return a valid JSON object matching the schema criteria exactly. "
+        "Analyze the content strictly through a defense lens and map it to these rigid structural definitions:\n\n"
+        "Categories:\n"
+        "- Aerospace: Fighter jets, military drones, military transport aircraft, missile flight tests, air defense networks.\n"
+        "- Naval: Submarines, aircraft carriers, naval exercises, maritime security operations.\n"
+        "- Land Systems: Tanks, armored vehicles, artillery, infantry developments, tactical border infrastructure.\n"
+        "- Geopolitics: Strategic global defense treaties, international sanctions, diplomatic defense summits.\n"
+        "- Trivial: Domestic local political disputes, civilian events, entertainment, sports, or historical updates completely lacking present tactical threat or urgency.\n\n"
+        "Importance Tiers:\n"
+        "- HIGH: Active/imminent combat deployments, urgent multi-billion dollar emergency combat aircraft/fleet procurement orders, strategic nuclear weapon trials.\n"
+        "- MEDIUM: Scheduled multilateral military exercises, standard iterative technological upgrades to existing fleets, routine administrative command handovers.\n"
+        "- LOW: Historical media throwbacks, ceremonial parades, non-urgent military retirement announcements, veteran acknowledgements.\n\n"
+        "Required Output JSON Structure:\n"
+        "{\n"
+        '  "is_defense_related": true|false,\n'
+        '  "confidence": 0.0 to 1.0,\n'
+        '  "category": "Aerospace"|"Naval"|"Land Systems"|"Geopolitics"|"Trivial",\n'
+        '  "importance": "HIGH"|"MEDIUM"|"LOW",\n'
+        '  "headline": "Short 5-10 word punchy headline for the intelligence brief.",\n'
+        '  "summary": "1-2 sentence concise, factual analytical summary expanding on the headline.",\n'
+        '  "keywords": ["keyword1", "keyword2"],\n'
+        '  "entities": ["Organization", "Location", "Weapon System"]\n'
+        "}"
     )
 
-    for row in unprocessed_rows:
-        post_id, handle, text_content, timestamp, post_url = row
-        print(f"\n🧠 Evaluating item [{post_id}] from @{handle}...")
+    few_shot_examples = (
+        "\n\nExample 1: 'Flashback to 1965: A rare look at the tactical configurations of the Indian Army division positions near the border.'\n"
+        'Output: {"is_defense_related": true, "confidence": 1.0, "category": "Land Systems", "importance": "LOW", "headline": "1965 Border Division Positions Revisited", "summary": "Historical media overview revisiting tactical configurations of Indian Army divisions deployed near the border during the 1965 conflict.", "keywords": ["history", "1965", "border"], "entities": ["Indian Army"]}\n'
+        "\nExample 2: 'The defense ministry starts routine trials for upgrading tracking software variants on older naval frigates.'\n"
+        'Output: {"is_defense_related": true, "confidence": 0.95, "category": "Naval", "importance": "MEDIUM", "headline": "Navy Frigate Tracking Software Upgrade Trials Begin", "summary": "Defense ministry initiates routine trials to upgrade tracking software systems on aging naval frigates in the active fleet.", "keywords": ["upgrade", "frigate", "trials"], "entities": ["Ministry of Defense"]}\n'
+        "\nExample 3: 'BREAKING: Air Force mobilizes multiple active stealth squadrons to forward operational bases along disputed line of control.'\n"
+        'Output: {"is_defense_related": true, "confidence": 1.0, "category": "Aerospace", "importance": "HIGH", "headline": "Stealth Squadrons Deployed to Forward Bases", "summary": "Air Force mobilizes multiple active stealth fighter squadrons to forward operational bases along the disputed line of control amid escalating tensions.", "keywords": ["mobilization", "squadrons", "forward base"], "entities": ["Air Force"]}'
+    )
+
+    for post_id, handle, content in batch:
+        print(f"\n📡 Requesting extraction parameters for item [{post_id}]...")
+        
+        # Mark row as processing immediately to lock it
+        cur.execute("UPDATE raw_posts SET status = 'PROCESSING' WHERE post_id = %s;", (post_id,))
+        conn.commit()
         
         try:
-            # Execute structured JSON generation using Gemini 1.5 Flash
-            response = client.models.generate_content(
-                model='gemini-3.5-flash',
-                contents=f"Text to evaluate:\n\"\"\"\n{text_content}\n\"\"\"",
-                config=types.GenerateContentConfig(
-                    system_instruction=system_prompt,
-                    # Force the model to return a structured JSON mapping matching our application layer
-                    response_mime_type="application/json",
-                    response_schema=types.Schema(
-                        type=types.Type.OBJECT,
-                        properties={
-                            "category": types.Schema(type=types.Type.STRING, enum=["DEFENSE", "TRIVIAL"]),
-                            "confidence_score": types.Schema(type=types.Type.NUMBER),
-                            "justification": types.Schema(type=types.Type.STRING)
-                        },
-                        required=["category", "confidence_score", "justification"]
-                    ),
-                    temperature=0.1 # Low temperature for consistent, strict analytical classification
-                ),
+            # Call OpenRouter with a strict client side timeout to stop freezing dead drops
+            response = client.chat.completions.create(
+                model=PRIMARY_MODEL,
+                messages=[
+                    {"role": "system", "content": system_prompt + few_shot_examples},
+                    {"role": "user", "content": f"Source: @{handle}\nContent: {content}"}
+                ],
+                timeout=20.0 # Strict 20 second absolute server cutoff line
             )
             
-            # Parse the model's structured response string
-            analysis = json.loads(response.text)
-            category = analysis.get("category")
-            confidence = analysis.get("confidence_score")
-            justification = analysis.get("justification")
+            raw_text = response.choices[0].message.content
+            cleaned_json = clean_json_string(raw_text)
+            parsed_data = json.loads(cleaned_json)
             
-            print(f"📊 Result: Category={category} | Confidence={confidence}")
-            print(f"📝 Reason: {justification}")
+            # Validation Step: Ensure vital schema attributes match up
+            is_defense = parsed_data.get("is_defense_related", False)
+            confidence = parsed_data.get("confidence", 0.0)
             
-            # Transaction branch: If it's a valid intelligence lead, route it or drop it based on classification
-            if category == "DEFENSE":
-                print(f"🎯 HIGH SIGNAL DETECTED. Indexing post into intelligence matrix...")
-                # Here you can map an INSERT statement to your frontend-facing 'classified_leads' table.
-                # For this test run, we will focus on updating the state pipeline.
+            # Set state based on intelligence matrix bounds
+            final_state = "DONE"
+            if confidence < 0.85:
+                final_state = "NEEDS_REVIEW"
+                
+            if is_defense:
+                print(f"🎯 Verified Defense Lead Detected. Populating intelligence matrix row.")
+                cur.execute("""
+                    INSERT INTO processed_intelligence (post_id, account_handle, category, importance, confidence_score, headline, summary, keywords, entities)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (post_id) DO NOTHING;
+                """, (
+                    post_id, handle, parsed_data.get("category"), parsed_data.get("importance", "LOW"),
+                    confidence, parsed_data.get("headline", parsed_data.get("summary")), parsed_data.get("summary"), parsed_data.get("keywords", []), parsed_data.get("entities", [])
+                ))
 
-            # Update state flag so the queue knows this record is handled
-            cur.execute("UPDATE raw_posts SET is_processed = TRUE WHERE post_id = %s;", (post_id,))
+            # Mark master row tracking update
+            cur.execute("UPDATE raw_posts SET status = %s, classification_log = 'Success' WHERE post_id = %s;", (final_state, post_id))
             conn.commit()
-            
-        except Exception as eval_err:
+            print(f"✅ Record state resolved to: {final_state}")
+
+        except Exception as err:
             conn.rollback()
-            print(f"⚠️ Failed to accurately process item {post_id}: {eval_err}")
+            error_msg = f"{type(err).__name__}: {str(err)}"
+            print(f"⚠️ Extraction execution crash for item {post_id}. Logging and shifting pipeline.")
+            cur.execute("UPDATE raw_posts SET status = 'FAILED', classification_log = %s WHERE post_id = %s;", (error_msg, post_id))
+            conn.commit()
             
     cur.close()
     conn.close()
-    print("\n🏁 Queue processing sweep complete.")
+    print("\n🏁 Queue batch run sweep finished.")
 
 if __name__ == "__main__":
-    process_unclassified_posts()
+    pipeline_sweep_batch()

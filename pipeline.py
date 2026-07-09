@@ -50,7 +50,20 @@ def run_ingestion_pipeline(handle):
             page.wait_for_timeout(2000)
             
             visible_tweets = page.query_selector_all('article')
-            tweet_window = visible_tweets[:3]
+            
+            # Filter out pinned tweets and grab the top 3 real tweets
+            valid_tweets = []
+            for t in visible_tweets:
+                text_content = t.inner_text()
+                # Pinned tweets usually have "Pinned" right at the top
+                if text_content and "Pinned" in text_content[:50]:
+                    print("📌 Skipping pinned tweet...")
+                    continue
+                valid_tweets.append(t)
+                if len(valid_tweets) >= 3:
+                    break
+            
+            tweet_window = valid_tweets
             print(f"📦 Isolated top {len(tweet_window)} visible authenticated feed items. Parsing...")
 
             for index, tweet_container in enumerate(tweet_window):
