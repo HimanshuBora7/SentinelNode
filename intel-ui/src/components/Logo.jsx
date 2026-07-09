@@ -17,17 +17,17 @@ import { useState, useMemo } from "react";
 
 export default function Logo({ status = "online", size = 40 }) {
   const palette = {
-    online:   { accent: "#4F8CFF", accentAlt: "#7EB4FF", glow: "rgba(79,140,255,0.6)",  bg: "rgba(79,140,255,0.06)" },
-    scanning: { accent: "#2CCB7F", accentAlt: "#5DFFA8", glow: "rgba(44,203,127,0.6)",   bg: "rgba(44,203,127,0.06)" },
-    alert:    { accent: "#EF4444", accentAlt: "#FF7B7B", glow: "rgba(239,68,68,0.7)",     bg: "rgba(239,68,68,0.08)" },
-    standby:  { accent: "#F5B942", accentAlt: "#FFD97A", glow: "rgba(245,185,66,0.5)",    bg: "rgba(245,185,66,0.05)" },
-    offline:  { accent: "#64748B", accentAlt: "#94A3B8", glow: "rgba(100,116,139,0.25)",   bg: "rgba(100,116,139,0.04)" },
+    online:   { accent: "#60A5FA", accentAlt: "#93C5FD", glow: "rgba(96,165,250,0.8)",  bg: "rgba(96,165,250,0.1)" },
+    scanning: { accent: "#4ADE80", accentAlt: "#86EFAC", glow: "rgba(74,222,128,0.8)",   bg: "rgba(74,222,128,0.1)" },
+    alert:    { accent: "#F87171", accentAlt: "#FCA5A5", glow: "rgba(248,113,113,0.9)",  bg: "rgba(248,113,113,0.15)" },
+    standby:  { accent: "#FBBF24", accentAlt: "#FDE047", glow: "rgba(251,191,36,0.7)",   bg: "rgba(251,191,36,0.1)" },
+    offline:  { accent: "#94A3B8", accentAlt: "#CBD5E1", glow: "rgba(203,213,225,0.4)",  bg: "rgba(148,163,184,0.1)" },
   };
 
   const { accent, accentAlt, glow, bg } = palette[status] || palette.online;
 
-  /* unique id prefix for filters/gradients */
-  const [uid] = useState(() => `sn-${Math.random().toString(36).slice(2, 7)}`);
+  /* Use a static prefix for SVG filters to prevent flickering on re-renders */
+  const uid = "sn-header-logo";
 
   /* node positions — diamond + core */
   const core = { cx: 50, cy: 50 };

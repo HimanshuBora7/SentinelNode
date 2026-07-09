@@ -8,7 +8,7 @@ export default function Header() {
       <div className="header__left"></div>
 
       <div className="header__logo">
-        <Logo size={38} status="online" />
+        <Logo size={44} status="online" />
       </div>
 
       <div className="header__profile">

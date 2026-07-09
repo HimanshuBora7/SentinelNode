@@ -1,41 +1,32 @@
+import { Link } from "react-router-dom";
 import "../styles/IntelligenceCard.css";
 
-export default function IntelligenceCard() {
+function timeAgo(timestamp) {
+  if (!timestamp) return "unknown";
+  const seconds = Math.floor((Date.now() - new Date(timestamp)) / 1000);
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+export default function IntelligenceCard({ post }) {
   return (
-    <article className="intel-card">
+    <Link to={`/detail/${post.post_id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
       <article className="intel-card">
-        <div className="intel-card__classification">
-          <span className="intel-card__category">CYBER OPERATIONS</span>
-          <span className="intel-card__priority">P1</span>
-        </div>
+        <h2 className="intel-card__title">{post.headline || post.summary}</h2>
 
-        <h2 className="intel-card__title">
-          Coordinated phishing campaign targets university email accounts
-        </h2>
-
-        <p className="intel-card__summary">
-          Multiple institutions reported credential harvesting attempts through
-          spoofed Outlook login pages. Activity increased during the last 24
-          hours.
-        </p>
+        <p className="intel-card__summary">{post.summary}</p>
 
         <div className="intel-card__meta">
-          <div className="meta-item">
-            <span className="meta-label">Confidence</span>
-            <span className="meta-value">92%</span>
-          </div>
-
-          <div className="meta-item">
-            <span className="meta-label">Source</span>
-            <span className="meta-value">CERT-In</span>
-          </div>
-
-          <div className="meta-item">
-            <span className="meta-label">Updated</span>
-            <span className="meta-value">3 min ago</span>
-          </div>
+          <span>@{post.account_handle}</span>
+          <span>•</span>
+          <span>{timeAgo(post.timestamp)}</span>
         </div>
       </article>
-    </article>
+    </Link>
   );
 }

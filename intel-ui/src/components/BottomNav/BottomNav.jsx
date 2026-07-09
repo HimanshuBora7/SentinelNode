@@ -30,7 +30,13 @@ export default function BottomNav() {
         return (
           <button
             key={item.id}
-            onClick={() => setActiveNav(item.id)}
+            onClick={() => {
+              if (item.id !== "home") {
+                alert("This feature is still in development.");
+              } else {
+                setActiveNav(item.id);
+              }
+            }}
             className={
               activeNav === item.id
                 ? "bottom-nav__item active"
