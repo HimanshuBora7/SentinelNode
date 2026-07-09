@@ -3,8 +3,9 @@ import random
 import psycopg2
 import os
 from dotenv import load_dotenv
-# Import the engine function we just built and tested
 from pipeline import run_ingestion_pipeline
+from classifier import pipeline_sweep_batch
+from embedder import populate_missing_embeddings
 
 load_dotenv()
 
@@ -49,17 +50,24 @@ def start_orchestrator():
             run_ingestion_pipeline(handle)
             
             # 2. Inject Micro-Jitter between accounts to look human
-            # Sleeps anywhere from 15 to 45 seconds between individual profiles
             account_jitter = random.randint(15, 45)
             print(f"💤 Account cycle complete. Jittering for {account_jitter} seconds before next target...")
             time.sleep(account_jitter)
             
+        print("\n🧠 Scraping complete. Running AI Classification on all pending posts...")
+        # Run the classifier multiple times to make sure we clear the queue (since it processes 10 at a time)
+        for _ in range(5):
+            pipeline_sweep_batch()
+            
+        print("\n📡 Classification complete. Generating Vector Embeddings for new intelligence...")
+        populate_missing_embeddings()
+        
         # 3. Macro-Jitter between full cycles
-        # Base cycle time is ~20 minutes (1200 seconds) + a random swing of +/- 5 minutes
         base_cycle_time = 1200
         cycle_variance = random.randint(-300, 300)
-        total_cycle_sleep = max(600, base_cycle_time + cycle_variance) # Guarantee minimum 10 min sleep
+        total_cycle_sleep = max(600, base_cycle_time + cycle_variance) 
         
+        print(f"\n🏁 Full pipeline cycle complete. Sleeping for {total_cycle_sleep // 60} minutes before polling again...")
         print(f"🏁 Full tracking cycle complete. Sleeping for {total_cycle_sleep // 60} minutes before polling again...")
         time.sleep(total_cycle_sleep)
 
