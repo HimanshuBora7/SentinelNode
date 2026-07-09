@@ -1,7 +1,10 @@
 .env
-.venv
+.venv/
 __pycache__/
-x_chrome_profile
+*.pyc
+x_chrome_profile/
 auth_state.py
 auth_state.json
 auth_capture.py
+x_profile_snapshot.png
+*.log

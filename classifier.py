@@ -10,7 +10,7 @@ load_dotenv()
 # OpenRouter Configuration Setup
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 if not OPENROUTER_API_KEY:
-    print("❌ Missing OPENROUTER_API_KEY in environment.")
+    print(" Missing OPENROUTER_API_KEY in environment.")
     sys.exit(1)
 
 client = OpenAI(
@@ -40,7 +40,7 @@ def clean_json_string(raw_string):
     return cleaned.strip()
 
 def pipeline_sweep_batch():
-    print(f"🤖 OpenRouter Intelligence Worker operating via model: {PRIMARY_MODEL}")
+    print(f"OpenRouter Intelligence Worker operating via model: {PRIMARY_MODEL}")
     conn = get_db_connection()
     cur = conn.cursor()
     
@@ -59,7 +59,7 @@ def pipeline_sweep_batch():
         conn.close()
         return
 
-    print(f"📦 Locked {len(batch)} items for batch processing loop.")
+    print(f"Locked {len(batch)} items for batch processing loop.")
 
     system_prompt = (
         "You are an expert military intelligence watch officer. Parse the text payload and return a valid JSON object matching the schema criteria exactly. "
@@ -97,7 +97,7 @@ def pipeline_sweep_batch():
     )
 
     for post_id, handle, content in batch:
-        print(f"\n📡 Requesting extraction parameters for item [{post_id}]...")
+        print(f"\nRequesting extraction parameters for item [{post_id}]...")
         
         # Mark row as processing immediately to lock it
         cur.execute("UPDATE raw_posts SET status = 'PROCESSING' WHERE post_id = %s;", (post_id,))
@@ -128,7 +128,7 @@ def pipeline_sweep_batch():
                 final_state = "NEEDS_REVIEW"
                 
             if is_defense:
-                print(f"🎯 Verified Defense Lead Detected. Populating intelligence matrix row.")
+                print(f"Verified Defense Lead Detected. Populating intelligence matrix row.")
                 cur.execute("""
                     INSERT INTO processed_intelligence (post_id, account_handle, category, importance, confidence_score, headline, summary, keywords, entities)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -141,12 +141,12 @@ def pipeline_sweep_batch():
             # Mark master row tracking update
             cur.execute("UPDATE raw_posts SET status = %s, classification_log = 'Success' WHERE post_id = %s;", (final_state, post_id))
             conn.commit()
-            print(f"✅ Record state resolved to: {final_state}")
+            print(f"Record state resolved to: {final_state}")
 
         except Exception as err:
             conn.rollback()
             error_msg = f"{type(err).__name__}: {str(err)}"
-            print(f"⚠️ Extraction execution crash for item {post_id}. Logging and shifting pipeline.")
+            print(f"Extraction execution crash for item {post_id}. Logging and shifting pipeline.")
             cur.execute("UPDATE raw_posts SET status = 'FAILED', classification_log = %s WHERE post_id = %s;", (error_msg, post_id))
             conn.commit()
             

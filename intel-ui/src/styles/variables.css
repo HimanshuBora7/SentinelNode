@@ -1,7 +1,7 @@
 :root {
-  /* ===============================
+  /* 
        COLORS
-    =============================== */
+     */
 
   --bg-primary: #090c12;
   --bg-surface: #121822;
@@ -23,9 +23,9 @@
 :root {
   /* previous variables */
 
-  /* ===============================
+  /* 
        TYPOGRAPHY
-    =============================== */
+= */
 
   --font-heading: "Space Grotesk", sans-serif;
   --font-body: "Geist", sans-serif;
@@ -41,9 +41,9 @@
 :root {
   /* previous variables */
 
-  /* ===============================
+  /*
        SPACING
-    =============================== */
+  */
 
   --space-1: 4px;
   --space-2: 8px;

@@ -1,27 +1,37 @@
 import { useState, useMemo } from "react";
 
-/**
- * SentinelNode — Premium Animated Intelligence Logo
- *
- * States:
- *   "online"   → calm pulse, orbiting particles, soft glow
- *   "scanning"  → active radar sweep, data flowing through connections
- *   "alert"    → red pulse + shake, urgent warning feel
- *   "standby"  → slow breathing, dimmed nodes, amber
- *   "offline"  → glitch flicker, broken connections, desaturated
- *
- * Props:
- *   status  — one of the above       (default "online")
- *   size    — pixel width/height     (default 40)
- */
-
 export default function Logo({ status = "online", size = 40 }) {
   const palette = {
-    online:   { accent: "#60A5FA", accentAlt: "#93C5FD", glow: "rgba(96,165,250,0.8)",  bg: "rgba(96,165,250,0.1)" },
-    scanning: { accent: "#4ADE80", accentAlt: "#86EFAC", glow: "rgba(74,222,128,0.8)",   bg: "rgba(74,222,128,0.1)" },
-    alert:    { accent: "#F87171", accentAlt: "#FCA5A5", glow: "rgba(248,113,113,0.9)",  bg: "rgba(248,113,113,0.15)" },
-    standby:  { accent: "#FBBF24", accentAlt: "#FDE047", glow: "rgba(251,191,36,0.7)",   bg: "rgba(251,191,36,0.1)" },
-    offline:  { accent: "#94A3B8", accentAlt: "#CBD5E1", glow: "rgba(203,213,225,0.4)",  bg: "rgba(148,163,184,0.1)" },
+    online: {
+      accent: "#60A5FA",
+      accentAlt: "#93C5FD",
+      glow: "rgba(96,165,250,0.8)",
+      bg: "rgba(96,165,250,0.1)",
+    },
+    scanning: {
+      accent: "#4ADE80",
+      accentAlt: "#86EFAC",
+      glow: "rgba(74,222,128,0.8)",
+      bg: "rgba(74,222,128,0.1)",
+    },
+    alert: {
+      accent: "#F87171",
+      accentAlt: "#FCA5A5",
+      glow: "rgba(248,113,113,0.9)",
+      bg: "rgba(248,113,113,0.15)",
+    },
+    standby: {
+      accent: "#FBBF24",
+      accentAlt: "#FDE047",
+      glow: "rgba(251,191,36,0.7)",
+      bg: "rgba(251,191,36,0.1)",
+    },
+    offline: {
+      accent: "#94A3B8",
+      accentAlt: "#CBD5E1",
+      glow: "rgba(203,213,225,0.4)",
+      bg: "rgba(148,163,184,0.1)",
+    },
   };
 
   const { accent, accentAlt, glow, bg } = palette[status] || palette.online;
@@ -32,25 +42,25 @@ export default function Logo({ status = "online", size = 40 }) {
   /* node positions — diamond + core */
   const core = { cx: 50, cy: 50 };
   const nodes = [
-    { cx: 50, cy: 14 },   // N
-    { cx: 86, cy: 50 },   // E
-    { cx: 50, cy: 86 },   // S
-    { cx: 14, cy: 50 },   // W
+    { cx: 50, cy: 14 }, // N
+    { cx: 86, cy: 50 }, // E
+    { cx: 50, cy: 86 }, // S
+    { cx: 14, cy: 50 }, // W
   ];
   const diagNodes = [
-    { cx: 74, cy: 26 },   // NE
-    { cx: 74, cy: 74 },   // SE
-    { cx: 26, cy: 74 },   // SW
-    { cx: 26, cy: 26 },   // NW
+    { cx: 74, cy: 26 }, // NE
+    { cx: 74, cy: 74 }, // SE
+    { cx: 26, cy: 74 }, // SW
+    { cx: 26, cy: 26 }, // NW
   ];
 
   /* animation speeds per status */
   const speed = {
-    online:   { pulse: "3s",   orbit: "8s",  sweep: "0s"  },
-    scanning: { pulse: "1.5s", orbit: "3s",  sweep: "2s"  },
-    alert:    { pulse: "0.6s", orbit: "1.2s", sweep: "0s"  },
-    standby:  { pulse: "5s",   orbit: "12s", sweep: "0s"  },
-    offline:  { pulse: "0s",   orbit: "0s",  sweep: "0s"  },
+    online: { pulse: "3s", orbit: "8s", sweep: "0s" },
+    scanning: { pulse: "1.5s", orbit: "3s", sweep: "2s" },
+    alert: { pulse: "0.6s", orbit: "1.2s", sweep: "0s" },
+    standby: { pulse: "5s", orbit: "12s", sweep: "0s" },
+    offline: { pulse: "0s", orbit: "0s", sweep: "0s" },
   };
   const s = speed[status] || speed.online;
 
@@ -124,16 +134,16 @@ export default function Logo({ status = "online", size = 40 }) {
     }
   `;
 
-  const isOnline   = status === "online";
+  const isOnline = status === "online";
   const isScanning = status === "scanning";
-  const isAlert    = status === "alert";
-  const isStandby  = status === "standby";
-  const isOffline  = status === "offline";
+  const isAlert = status === "alert";
+  const isStandby = status === "standby";
+  const isOffline = status === "offline";
 
   /* root animation for the whole SVG */
   const rootStyle = {
     display: "block",
-    ...(isAlert   && { animation: `${uid}-shake 0.4s ease-in-out infinite` }),
+    ...(isAlert && { animation: `${uid}-shake 0.4s ease-in-out infinite` }),
     ...(isOffline && { animation: `${uid}-glitch 3s steps(1) infinite` }),
   };
 
@@ -163,7 +173,13 @@ export default function Logo({ status = "online", size = 40 }) {
         </filter>
 
         {/* Subtle outer glow for nodes */}
-        <filter id={`${uid}-node-glow`} x="-100%" y="-100%" width="300%" height="300%">
+        <filter
+          id={`${uid}-node-glow`}
+          x="-100%"
+          y="-100%"
+          width="300%"
+          height="300%"
+        >
           <feGaussianBlur stdDeviation="2.5" />
         </filter>
 
@@ -190,7 +206,9 @@ export default function Logo({ status = "online", size = 40 }) {
       {[46, 34, 22].map((r, i) => (
         <circle
           key={`ring-${i}`}
-          cx="50" cy="50" r={r}
+          cx="50"
+          cy="50"
+          r={r}
           stroke={accent}
           strokeWidth={0.6 - i * 0.15}
           strokeDasharray={`${3 - i * 0.5} ${5 + i}`}
@@ -200,19 +218,22 @@ export default function Logo({ status = "online", size = 40 }) {
       ))}
 
       {/* ── Scanning: expanding sonar rings ── */}
-      {isScanning && [0, 1, 2].map(i => (
-        <circle
-          key={`sonar-${i}`}
-          cx="50" cy="50" r="10"
-          fill="none"
-          stroke={accent}
-          strokeWidth="1.5"
-          style={{
-            animation: `${uid}-ring-expand 2.4s ease-out infinite`,
-            animationDelay: `${i * 0.8}s`,
-          }}
-        />
-      ))}
+      {isScanning &&
+        [0, 1, 2].map((i) => (
+          <circle
+            key={`sonar-${i}`}
+            cx="50"
+            cy="50"
+            r="10"
+            fill="none"
+            stroke={accent}
+            strokeWidth="1.5"
+            style={{
+              animation: `${uid}-ring-expand 2.4s ease-out infinite`,
+              animationDelay: `${i * 0.8}s`,
+            }}
+          />
+        ))}
 
       {/* ══════════════════════════════════════
            LAYER 2 — Connections (core → cardinal)
@@ -220,8 +241,10 @@ export default function Logo({ status = "online", size = 40 }) {
       {nodes.map((n, i) => (
         <line
           key={`conn-${i}`}
-          x1={core.cx} y1={core.cy}
-          x2={n.cx} y2={n.cy}
+          x1={core.cx}
+          y1={core.cy}
+          x2={n.cx}
+          y2={n.cy}
           stroke={accent}
           strokeWidth="1.5"
           strokeLinecap="round"
@@ -238,12 +261,17 @@ export default function Logo({ status = "online", size = 40 }) {
 
       {/* ── Mesh connections (cardinal → diagonal neighbours) ── */}
       {[
-        [0, 1], [1, 2], [2, 3], [3, 0],
+        [0, 1],
+        [1, 2],
+        [2, 3],
+        [3, 0],
       ].map(([a, b], i) => (
         <line
           key={`mesh-${i}`}
-          x1={nodes[a].cx} y1={nodes[a].cy}
-          x2={nodes[b].cx} y2={nodes[b].cy}
+          x1={nodes[a].cx}
+          y1={nodes[a].cy}
+          x2={nodes[b].cx}
+          y2={nodes[b].cy}
           stroke={accent}
           strokeWidth="0.7"
           strokeLinecap="round"
@@ -258,8 +286,10 @@ export default function Logo({ status = "online", size = 40 }) {
       {diagNodes.map((n, i) => (
         <line
           key={`inner-${i}`}
-          x1={core.cx} y1={core.cy}
-          x2={n.cx} y2={n.cy}
+          x1={core.cx}
+          y1={core.cy}
+          x2={n.cx}
+          y2={n.cy}
           stroke={accent}
           strokeWidth="0.6"
           strokeLinecap="round"
@@ -271,12 +301,17 @@ export default function Logo({ status = "online", size = 40 }) {
            LAYER 3 — Radar sweep (scanning only)
          ══════════════════════════════════════ */}
       {isScanning && (
-        <g style={{
-          transformOrigin: "50px 50px",
-          animation: `${uid}-sweep ${s.sweep} linear infinite`,
-        }}>
+        <g
+          style={{
+            transformOrigin: "50px 50px",
+            animation: `${uid}-sweep ${s.sweep} linear infinite`,
+          }}
+        >
           <line
-            x1="50" y1="50" x2="50" y2="4"
+            x1="50"
+            y1="50"
+            x2="50"
+            y2="4"
             stroke={accent}
             strokeWidth="1.2"
             strokeLinecap="round"
@@ -296,21 +331,25 @@ export default function Logo({ status = "online", size = 40 }) {
          ══════════════════════════════════════ */}
 
       {/* Glow layer (behind solid nodes) */}
-      {!isOffline && nodes.map((n, i) => (
-        <circle
-          key={`nglow-${i}`}
-          cx={n.cx} cy={n.cy} r="6"
-          fill={accent}
-          filter={`url(#${uid}-node-glow)`}
-          opacity="0.3"
-        />
-      ))}
+      {!isOffline &&
+        nodes.map((n, i) => (
+          <circle
+            key={`nglow-${i}`}
+            cx={n.cx}
+            cy={n.cy}
+            r="6"
+            fill={accent}
+            filter={`url(#${uid}-node-glow)`}
+            opacity="0.3"
+          />
+        ))}
 
       {/* Cardinal nodes */}
       {nodes.map((n, i) => (
         <circle
           key={`node-${i}`}
-          cx={n.cx} cy={n.cy}
+          cx={n.cx}
+          cy={n.cy}
           r={isOffline ? 3 : 4}
           fill={accent}
           opacity={isOffline ? 0.3 : 0.85}
@@ -321,7 +360,8 @@ export default function Logo({ status = "online", size = 40 }) {
       {diagNodes.map((n, i) => (
         <circle
           key={`dnode-${i}`}
-          cx={n.cx} cy={n.cy}
+          cx={n.cx}
+          cy={n.cy}
           r={isOffline ? 1.5 : 2.5}
           fill={accentAlt}
           opacity={isOffline ? 0.15 : 0.5}
@@ -334,20 +374,24 @@ export default function Logo({ status = "online", size = 40 }) {
       {!isOffline && (
         <>
           {/* Outer orbit ring */}
-          <g style={{
-            transformOrigin: "50px 50px",
-            animation: `${uid}-orbit ${s.orbit} linear infinite`,
-          }}>
+          <g
+            style={{
+              transformOrigin: "50px 50px",
+              animation: `${uid}-orbit ${s.orbit} linear infinite`,
+            }}
+          >
             <circle cx="50" cy="8" r="1.8" fill={accentAlt} opacity="0.7" />
             <circle cx="92" cy="50" r="1.2" fill={accent} opacity="0.5" />
             <circle cx="50" cy="92" r="1.5" fill={accentAlt} opacity="0.6" />
           </g>
 
           {/* Inner counter-orbit */}
-          <g style={{
-            transformOrigin: "50px 50px",
-            animation: `${uid}-orbit-rev ${s.orbit} linear infinite`,
-          }}>
+          <g
+            style={{
+              transformOrigin: "50px 50px",
+              animation: `${uid}-orbit-rev ${s.orbit} linear infinite`,
+            }}
+          >
             <circle cx="50" cy="28" r="1.2" fill={accentAlt} opacity="0.45" />
             <circle cx="72" cy="50" r="1" fill={accent} opacity="0.35" />
           </g>
@@ -361,7 +405,8 @@ export default function Logo({ status = "online", size = 40 }) {
       {/* Pulse ring */}
       {!isOffline && (
         <circle
-          cx={core.cx} cy={core.cy}
+          cx={core.cx}
+          cy={core.cy}
           r="14"
           fill="none"
           stroke={glow}
@@ -374,15 +419,19 @@ export default function Logo({ status = "online", size = 40 }) {
       )}
 
       {/* Breathe wrapper for core */}
-      <g style={{
-        transformOrigin: "50px 50px",
-        ...(!isOffline && {
-          animation: `${uid}-breathe ${s.pulse} ease-in-out infinite`,
-        }),
-      }}>
+      <g
+        style={{
+          transformOrigin: "50px 50px",
+          ...(!isOffline && {
+            animation: `${uid}-breathe ${s.pulse} ease-in-out infinite`,
+          }),
+        }}
+      >
         {/* Core glow background */}
         <circle
-          cx={core.cx} cy={core.cy} r="10"
+          cx={core.cx}
+          cy={core.cy}
+          r="10"
           fill={accent}
           filter={`url(#${uid}-glow)`}
           opacity={isOffline ? 0.15 : 0.6}
@@ -390,14 +439,16 @@ export default function Logo({ status = "online", size = 40 }) {
 
         {/* Core solid circle with gradient */}
         <circle
-          cx={core.cx} cy={core.cy}
+          cx={core.cx}
+          cy={core.cy}
           r={isOffline ? 7 : 9}
           fill={`url(#${uid}-core-grad)`}
         />
 
         {/* Specular highlight */}
         <circle
-          cx={core.cx - 3} cy={core.cy - 3}
+          cx={core.cx - 3}
+          cy={core.cy - 3}
           r="2.5"
           fill="white"
           opacity={isOffline ? 0.08 : 0.3}
@@ -410,15 +461,33 @@ export default function Logo({ status = "online", size = 40 }) {
       {isOffline && (
         <g opacity="0.2">
           {/* X mark across the core */}
-          <line x1="42" y1="42" x2="58" y2="58" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" />
-          <line x1="58" y1="42" x2="42" y2="58" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" />
+          <line
+            x1="42"
+            y1="42"
+            x2="58"
+            y2="58"
+            stroke="#EF4444"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <line
+            x1="58"
+            y1="42"
+            x2="42"
+            y2="58"
+            stroke="#EF4444"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
         </g>
       )}
 
       {/* ── Alert: outer danger ring ── */}
       {isAlert && (
         <circle
-          cx="50" cy="50" r="46"
+          cx="50"
+          cy="50"
+          r="46"
           fill="none"
           stroke={accent}
           strokeWidth="1.5"

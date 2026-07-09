@@ -87,7 +87,7 @@ def get_system_status():
         pending_count = cur.fetchone()["count"]
         
         # Check for recent failures
-        cur.execute("SELECT status FROM source_health ORDER BY timestamp DESC LIMIT 1;")
+        cur.execute("SELECT status FROM source_health ORDER BY id DESC LIMIT 1;")
         latest_health = cur.fetchone()
         
         state = "online"

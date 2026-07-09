@@ -1,22 +1,3 @@
-/* ============================================================
-   Home — App shell layout (mobile-first)
-   
-   Structure:
-   ┌──────────────────┐
-   │  Header (sticky)  │  ← sticks to top on scroll
-   ├──────────────────┤
-   │  FeedTabs         │  ← sticky below header
-   ├──────────────────┤
-   │                  │
-   │  Main content    │  ← scrollable, grows to fill
-   │  (EmptyState /   │
-   │   Feed cards)    │
-   │                  │
-   ├──────────────────┤
-   │  BottomNav       │  ← fixed to bottom, always visible
-   └──────────────────┘
-   ============================================================ */
-
 .home {
   display: flex;
   flex-direction: column;

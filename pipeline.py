@@ -20,7 +20,7 @@ def log_pipeline_health(handle, status, error_msg=None):
         cur.execute("INSERT INTO source_health (account_handle, status, error_message) VALUES (%s, %s, %s);", (handle, status, error_msg))
         conn.commit()
     except Exception as e: 
-        print(f"⚠️ Telemetry failure: {e}")
+        print(f"Telemetry failure: {e}")
     finally:
         cur.close()
         conn.close()
@@ -31,7 +31,7 @@ def run_ingestion_pipeline(handle):
     print(f"🏁 Starting Authenticated Semantic Pipeline for: @{handle}")
     
     if not os.path.exists(state_file):
-        print(f"❌ Aborting: '{state_file}' missing. Run your auth configuration setup first.")
+        print(f"Aborting: '{state_file}' missing. Run your auth configuration setup first.")
         return
 
     extracted_payloads = []
@@ -57,14 +57,14 @@ def run_ingestion_pipeline(handle):
                 text_content = t.inner_text()
                 # Pinned tweets usually have "Pinned" right at the top
                 if text_content and "Pinned" in text_content[:50]:
-                    print("📌 Skipping pinned tweet...")
+                    print("Skipping pinned tweet...")
                     continue
                 valid_tweets.append(t)
                 if len(valid_tweets) >= 3:
                     break
             
             tweet_window = valid_tweets
-            print(f"📦 Isolated top {len(tweet_window)} visible authenticated feed items. Parsing...")
+            print(f"Isolated top {len(tweet_window)} visible authenticated feed items. Parsing...")
 
             for index, tweet_container in enumerate(tweet_window):
                 payload = {"post_id": None, "account_handle": handle, "text": None, "timestamp": None, "post_url": None, "media_urls": []}
@@ -95,12 +95,12 @@ def run_ingestion_pipeline(handle):
                 if payload["post_id"] and payload["timestamp"]:
                     extracted_payloads.append(payload)
                 else:
-                    print(f"⚠️ Container index {index} skipped. Missing essential routing fields. ID: {payload['post_id']}, TS: {payload['timestamp']}")
+                    print(f" Container index {index} skipped. Missing essential routing fields. ID: {payload['post_id']}, TS: {payload['timestamp']}")
 
         except Exception as e:
             error_trace = traceback.format_exc()
             log_pipeline_health(handle, "FAILED", error_trace)
-            print(f"❌ Scraper extraction execution failure.")
+            print(f" Scraper extraction execution failure.")
             return
         finally:
             browser.close()
@@ -136,14 +136,14 @@ def run_ingestion_pipeline(handle):
         
         if new_inserts > 0:
             log_pipeline_health(handle, "SUCCESS")
-            print(f"📊 Summary: Synchronized {new_inserts} live semantic rows, skipped {duplicate_hits} historical items.")
+            print(f"Summary: Synchronized {new_inserts} live semantic rows, skipped {duplicate_hits} historical items.")
         else:
             log_pipeline_health(handle, "DUPLICATE")
-            print(f"ℹ️ Summary: All {duplicate_hits} window items match active database schema state.")
+            print(f"ℹ Summary: All {duplicate_hits} window items match active database schema state.")
             
     except Exception as db_error:
         log_pipeline_health(handle, "FAILED", f"Database ingestion failure on semantic layout: {db_error}")
-        print(f"❌ Database synchronization failed.")
+        print(f"Database synchronization failed.")
     finally:
         db_cursor.close()
         db_connection.close()

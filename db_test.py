@@ -17,7 +17,7 @@ def verify_database_connection():
         )
         
         cursor = connection.cursor()
-        print("✅ Python successfully connected to PostgreSQL!")
+        print("Python successfully connected to PostgreSQL!")
 
         # Execute a test query to read our seeded target account
         cursor.execute("SELECT handle, platform, priority FROM accounts;")
