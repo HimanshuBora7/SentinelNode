@@ -33,7 +33,7 @@ def verify_database_connection():
         connection.close()
 
     except Exception as error:
-        print(f"❌ Database connection failed! Error: {error}")
+        print(f" Database connection failed! Error: {error}")
 
 if __name__ == "__main__":
     verify_database_connection()

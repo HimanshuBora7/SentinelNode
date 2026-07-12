@@ -88,7 +88,7 @@ def populate_missing_embeddings():
 
     cur.close()
     conn.close()
-    print("🏁 Embedding loop sweep finished.")
+    print(" Embedding loop sweep finished.")
 
 if __name__ == "__main__":
     populate_missing_embeddings()

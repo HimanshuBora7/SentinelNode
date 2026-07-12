@@ -36,7 +36,7 @@ def add_account(handle):
         # Assuming priority is an integer. Defaulting to 1.
         cur.execute("INSERT INTO accounts (handle, platform, priority) VALUES (%s, 'X', 1) ON CONFLICT DO NOTHING;", (handle,))
         conn.commit()
-        print(f"✅ Added {handle} to database.")
+        print(f" Added {handle} to database.")
     except Exception as e:
         print(f"Error adding account: {e}")
     finally:
@@ -62,7 +62,7 @@ def remove_account(handle):
         cur.execute("DELETE FROM accounts WHERE handle = %s AND platform = 'X';", (handle,))
         
         conn.commit()
-        print(f"✅ Removed {handle} and all associated data from database.")
+        print(f" Removed {handle} and all associated data from database.")
     except Exception as e:
         print(f"Error removing account: {e}")
         conn.rollback()
@@ -77,9 +77,9 @@ def update_priority(handle, rank):
         cur.execute("UPDATE accounts SET priority = %s WHERE handle = %s AND platform = 'X';", (rank, handle))
         if cur.rowcount > 0:
             conn.commit()
-            print(f"✅ Updated {handle} to rank {rank}.")
+            print(f"Updated {handle} to rank {rank}.")
         else:
-            print(f"⚠️ Account {handle} not found.")
+            print(f" Account {handle} not found.")
     except Exception as e:
         print(f"Error updating rank: {e}")
     finally:

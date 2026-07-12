@@ -4,11 +4,11 @@ from playwright.sync_api import sync_playwright
 
 def run_preflight_check():
     state_file = "auth_state.json"
-    print("🔍 Initializing Pre-Flight Authentication Probe...")
+    print("Initializing Pre-Flight Authentication Probe...")
     
     if not os.path.exists(state_file):
-        print(f"❌ CRITICAL FAILURE: '{state_file}' not found in the current directory.")
-        print("👉 Please ensure you have created the file and populated your cookie data.")
+        print(f"CRITICAL FAILURE: '{state_file}' not found in the current directory.")
+        print("Please ensure you have created the file and populated your cookie data.")
         sys.exit(1)
 
     with sync_playwright() as p:
@@ -23,33 +23,33 @@ def run_preflight_check():
         page = context.new_page()
         
         try:
-            print("🌐 Navigating to X secure gateway (x.com/home)...")
+            print("🌐avigating to X secure gateway (x.com/home)...")
             page.goto("https://x.com/home", wait_until="commit", timeout=25000)
             
             # Wait up to 7 seconds to see if authenticated dashboard elements render
-            print("👀 Inspecting DOM for authenticated UI markers...")
+            print("Inspecting DOM for authenticated UI markers...")
             page.wait_for_selector('[data-testid="SideNav_AccountSwitcher_Button"]', timeout=7000)
             
             # Double check current active URL destination
             current_url = page.url
             
             if "login" in current_url or "flow" in current_url:
-                print(f"❌ PROBE FAILED: Server issued an auth-eviction redirect to: {current_url}")
-                print("⚠️ Your cookies were rejected by X. They may be expired, corrupted, or copied incorrectly.")
+                print(f"PROBE FAILED: Server issued an auth-eviction redirect to: {current_url}")
+                print("Your cookies were rejected by X. They may be expired, corrupted, or copied incorrectly.")
                 sys.exit(1)
                 
-            print("\n========================================================")
-            print("🚀 PRE-FLIGHT VERIFICATION: SUCCESS!")
-            print(f"🔐 Valid session confirmed. Current landing node: {current_url}")
-            print("========================================================\n")
+            
+            print("PRE-FLIGHT VERIFICATION: SUCCESS!")
+            print(f"Valid session confirmed. Current landing node: {current_url}")
+            
             
         except Exception as e:
-            print("\n========================================================")
-            print("❌ PRE-FLIGHT VERIFICATION: FAILED")
-            print("========================================================")
-            print(f"🚨 Reason: Authenticated UI components failed to render within the time window.")
-            print("👉 This usually means X blocked the session or redirected to a login wall.")
-            print(f"📋 Debug info: {e}")
+        
+            print("PRE-FLIGHT VERIFICATION: FAILED")
+           
+            print(f"Reason: Authenticated UI components failed to render within the time window.")
+            print("this usually means X blocked the session or redirected to a login wall.")
+            print(f"Debug info: {e}")
             sys.exit(1)
         finally:
             browser.close()

@@ -64,7 +64,7 @@ def cluster_recent_posts():
                 assigned_post_ids.add(post_j_id)
                 # for debugging
                 if similarity > 0.65:
-                    print(f"🤖 Similarity Score: {similarity:.2f}")
+                    print(f" Similarity Score: {similarity:.2f}")
                     print(f"  -> Post 1 (@{handle_i}): {headline_i}")
                     print(f"  -> Post 2 (@{handle_j}): {headline_j}")
                     print("-" * 50)
