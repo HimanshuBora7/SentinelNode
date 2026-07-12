@@ -1,3 +1,12 @@
+.desktop-only {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .desktop-only {
+    display: block;
+  }
+}
+
 .home {
   display: flex;
   flex-direction: column;
@@ -16,4 +25,80 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+}
+/* --- DESKTOP LAYOUT (Center Column) --- */
+@media (min-width: 1024px) {
+  .home {
+    flex-direction: column; /* Fixed: Back to column so Tabs are ON TOP of Cards */
+    align-items: center;
+    padding-bottom: 0;
+    padding-left: 200px; /* Match new 200px shrunk sidebar */
+    padding-right: 300px;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .home__content {
+    margin: 0;
+    width: 100%;
+    max-width: 650px; /* Restores the cards to their beautiful wide size */
+    flex: none;
+  }
+
+  .feed-tabs {
+    position: static; /* Lets it sit naturally above the cards */
+    width: 100%;
+    max-width: 650px;
+    margin-top: 40px;
+    margin-bottom: 24px;
+    background: transparent;
+  }
+}
+/* --- INFINITE TICKER ANIMATION --- */
+
+/* 
+  This animation slowly pushes the element UP. 
+  It stops at exactly -50% (which means it scrolled past exactly 1 copy of the list)
+*/
+@keyframes scroll-up {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.ticker-container {
+  max-height: 300px; /* Restricts the height so it doesn't spill over */
+  overflow: hidden; /* Hides everything outside the box */
+  position: relative;
+  /* Adds a cool fade effect at the top and bottom of the box so text fades in/out */
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+}
+
+.ticker-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  /* Runs the animation constantly, taking 25 seconds to complete one loop */
+  animation: scroll-up 25s linear infinite;
+}
+
+/* Bonus: When the user hovers their mouse over the box, pause the scrolling so they can read it! */
+.ticker-content:hover {
+  animation-play-state: paused;
 }

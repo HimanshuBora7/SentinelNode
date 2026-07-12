@@ -39,11 +39,12 @@ body {
   overflow-x: hidden;
 }
 
-/* --- App shell: centred column, capped width --- */
+/* --- App shell: responsive width --- */
 #root {
   display: flex;
   flex-direction: column;
-  max-width: 680px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
 }
 

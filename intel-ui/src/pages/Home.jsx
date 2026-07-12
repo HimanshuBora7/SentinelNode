@@ -5,6 +5,7 @@ import FeedTabs from "../components/FeedTabs/FeedTabs";
 import EmptyState from "../components/EmptyState/EmptyState";
 import BottomNav from "../components/BottomNav/BottomNav";
 import IntelligenceCard from "../components/IntelligenceCard";
+import RightSidebar from "../components/RightSidebar/RightSidebar";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
@@ -65,6 +66,9 @@ export default function Home() {
       </main>
 
       <BottomNav />
+      <div className="desktop-only">
+        <RightSidebar />
+      </div>
     </div>
   );
 }

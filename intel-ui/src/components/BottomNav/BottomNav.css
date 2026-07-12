@@ -72,3 +72,53 @@
 .bottom-nav__item:active {
   transform: scale(0.92);
 }
+/* Mobile: Hide labels & logo */
+.nav-label, .bottom-nav__logo {
+  display: none;
+}
+
+/* --- DESKTOP LAYOUT (Left Sidebar) --- */
+@media (min-width: 1024px) {
+  .bottom-nav {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 200px; /* Shrunk from 240px */
+    height: 100vh;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding-left: 24px;
+    gap: 32px;
+    border: none;
+    border-right: 1px solid var(--border);
+    transform: none;
+    max-width: none;
+  }
+
+  .bottom-nav__item {
+    width: auto;
+    height: auto;
+    padding: 12px;
+    border-radius: 99px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    font-family: var(--font-mono);
+  }
+
+  .bottom-nav__logo {
+    display: flex;
+    position: absolute;
+    top: 32px;
+    left: 36px; /* Aligned precisely with the left edge of the Icons! */
+    cursor: pointer;
+  }
+
+  /* Desktop: Show labels */
+  .nav-label {
+    display: block; 
+  }
+}

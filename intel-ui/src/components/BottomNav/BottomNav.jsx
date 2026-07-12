@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./BottomNav.css";
 import { useNavigate } from "react-router-dom";
+import Logo from "../Logo";
 
 import { House, Search, Bell, SquarePen } from "lucide-react";
 const navItems = [
@@ -27,6 +28,9 @@ export default function BottomNav() {
 
   return (
     <nav className="bottom-nav">
+      <div className="bottom-nav__logo" onClick={() => navigate("/")}>
+        <Logo size={36} status="online" />
+      </div>
       {navItems.map((item) => {
         const Icon = item.icon;
 
@@ -34,13 +38,13 @@ export default function BottomNav() {
           <button
             key={item.id}
             onClick={() => {
-              if (item.id === "publish") {
-                navigate("/contribute"); // Routes to your new Substack editor!
-              } else if (item.id !== "home") {
+              if (item.id === "publish") navigate("/contribute");
+              else if (item.id === "search") navigate("/search");
+              else if (item.id !== "home")
                 alert("This feature is still in development.");
-              } else {
+              else {
                 setActiveNav(item.id);
-                navigate("/"); // Routes back to home feed
+                navigate("/");
               }
             }}
             className={
@@ -50,6 +54,9 @@ export default function BottomNav() {
             }
           >
             <Icon size={22} />
+            <span className="nav-label" style={{ textTransform: "capitalize" }}>
+              {item.id}
+            </span>
           </button>
         );
       })}

@@ -78,3 +78,9 @@
     padding: 0 24px;
   }
 }
+/* Hide on Desktop */
+@media (min-width: 1024px) {
+  .header {
+    display: none;
+  }
+}
