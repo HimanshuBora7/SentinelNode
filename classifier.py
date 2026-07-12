@@ -74,11 +74,17 @@ def pipeline_sweep_batch():
         "- HIGH: Active/imminent combat deployments, urgent multi-billion dollar emergency combat aircraft/fleet procurement orders, strategic nuclear weapon trials.\n"
         "- MEDIUM: Scheduled multilateral military exercises, standard iterative technological upgrades to existing fleets, routine administrative command handovers.\n"
         "- LOW: Historical media throwbacks, ceremonial parades, non-urgent military retirement announcements, veteran acknowledgements.\n\n"
+                "Content Types:\n"
+        "- NEWS: Factual reporting of events, military deployments, or defense procurements. Contains verifiable claims.\n"
+        "- OPINION: Personal commentary, speculation, political spin, or subjective language ('I think', 'should have', 'disappointing').\n"
+        "- ANALYSIS: Objective, factual breakdown of a military event with strategic reasoning, but no breaking factual claims.\n\n"
+
         "Required Output JSON Structure:\n"
         "{\n"
         '  "is_defense_related": true|false,\n'
         '  "confidence": 0.0 to 1.0,\n'
         '  "category": "Aerospace"|"Naval"|"Land Systems"|"Geopolitics"|"Trivial",\n'
+        '  "content_type": "NEWS"|"OPINION"|"ANALYSIS",\n'
         '  "importance": "HIGH"|"MEDIUM"|"LOW",\n'
         '  "headline": "Short 5-10 word punchy headline for the intelligence brief.",\n'
         '  "summary": "1-2 sentence concise, factual analytical summary expanding on the headline.",\n'
@@ -89,11 +95,11 @@ def pipeline_sweep_batch():
 
     few_shot_examples = (
         "\n\nExample 1: 'Flashback to 1965: A rare look at the tactical configurations of the Indian Army division positions near the border.'\n"
-        'Output: {"is_defense_related": true, "confidence": 1.0, "category": "Land Systems", "importance": "LOW", "headline": "1965 Border Division Positions Revisited", "summary": "Historical media overview revisiting tactical configurations of Indian Army divisions deployed near the border during the 1965 conflict.", "keywords": ["history", "1965", "border"], "entities": ["Indian Army"]}\n'
+        'Output: {"is_defense_related": true, "confidence": 1.0, "category": "Land Systems", "content_type": "ANALYSIS", "importance": "LOW", "headline": "1965 Border Division Positions Revisited", "summary": "Historical media overview revisiting tactical configurations of Indian Army divisions deployed near the border during the 1965 conflict.", "keywords": ["history", "1965", "border"], "entities": ["Indian Army"]}\n'
         "\nExample 2: 'The defense ministry starts routine trials for upgrading tracking software variants on older naval frigates.'\n"
-        'Output: {"is_defense_related": true, "confidence": 0.95, "category": "Naval", "importance": "MEDIUM", "headline": "Navy Frigate Tracking Software Upgrade Trials Begin", "summary": "Defense ministry initiates routine trials to upgrade tracking software systems on aging naval frigates in the active fleet.", "keywords": ["upgrade", "frigate", "trials"], "entities": ["Ministry of Defense"]}\n'
-        "\nExample 3: 'BREAKING: Air Force mobilizes multiple active stealth squadrons to forward operational bases along disputed line of control.'\n"
-        'Output: {"is_defense_related": true, "confidence": 1.0, "category": "Aerospace", "importance": "HIGH", "headline": "Stealth Squadrons Deployed to Forward Bases", "summary": "Air Force mobilizes multiple active stealth fighter squadrons to forward operational bases along the disputed line of control amid escalating tensions.", "keywords": ["mobilization", "squadrons", "forward base"], "entities": ["Air Force"]}'
+        'Output: {"is_defense_related": true, "confidence": 0.95, "category": "Naval", "content_type": "NEWS", "importance": "MEDIUM", "headline": "Navy Frigate Tracking Software Upgrade Trials Begin", "summary": "Defense ministry initiates routine trials to upgrade tracking software systems on aging naval frigates in the active fleet.", "keywords": ["upgrade", "frigate", "trials"], "entities": ["Ministry of Defense"]}\n'
+        "\nExample 3: 'This new submarine deal is an absolute disaster. The government should have invested those funds into drone swarms instead.'\n"
+        'Output: {"is_defense_related": true, "confidence": 0.95, "category": "Naval", "content_type": "OPINION", "importance": "LOW", "headline": "Criticism of Recent Submarine Procurement Deal", "summary": "Commentator expresses strong subjective disapproval regarding the recent submarine procurement deal, advocating for investment in drone swarm technology instead.", "keywords": ["submarine", "drones", "procurement"], "entities": []}'
     )
 
     for post_id, handle, content in batch:
@@ -130,11 +136,11 @@ def pipeline_sweep_batch():
             if is_defense:
                 print(f"Verified Defense Lead Detected. Populating intelligence matrix row.")
                 cur.execute("""
-                    INSERT INTO processed_intelligence (post_id, account_handle, category, importance, confidence_score, headline, summary, keywords, entities)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO processed_intelligence (post_id, account_handle, category, content_type, importance, confidence_score, headline, summary, keywords, entities)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (post_id) DO NOTHING;
                 """, (
-                    post_id, handle, parsed_data.get("category"), parsed_data.get("importance", "LOW"),
+                    post_id, handle, parsed_data.get("category"), parsed_data.get("content_type", "NEWS"), parsed_data.get("importance", "LOW"),
                     confidence, parsed_data.get("headline", parsed_data.get("summary")), parsed_data.get("summary"), parsed_data.get("keywords", []), parsed_data.get("entities", [])
                 ))
 

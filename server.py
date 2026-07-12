@@ -26,7 +26,7 @@ def get_feed(category: str = None):
         if category and category.upper() != "ALL":
             # 1. Update the category-specific query
             cur.execute("""
-                SELECT pi.id, pi.post_id, pi.account_handle, pi.category,
+                SELECT pi.id, pi.post_id, pi.account_handle, pi.category,pi.content_type,
                        pi.importance, pi.confidence_score, pi.headline,
                        pi.summary, pi.keywords, pi.entities,
                        rp.text AS original_text, rp.timestamp,
@@ -50,7 +50,7 @@ def get_feed(category: str = None):
         else:
             # 2. Update the default "ALL" query
             cur.execute("""
-                SELECT pi.id, pi.post_id, pi.account_handle, pi.category,
+                SELECT pi.id, pi.post_id, pi.account_handle, pi.category,pi.content_type,
                        pi.importance, pi.confidence_score, pi.headline,
                        pi.summary, pi.keywords, pi.entities,
                        rp.text AS original_text, rp.timestamp,

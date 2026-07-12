@@ -21,6 +21,34 @@ export default function IntelligenceCard({ post }) {
     >
       <article className="intel-card">
         <h2 className="intel-card__title">{post.headline || post.summary}</h2>
+        {/* News vs Opinion Badge */}
+        <span
+          style={{
+            display: "inline-block",
+            background:
+              post.content_type === "OPINION"
+                ? "#4a1515"
+                : post.content_type === "ANALYSIS"
+                  ? "#152f4a"
+                  : "var(--bg-elevated)",
+            color:
+              post.content_type === "OPINION"
+                ? "#ff6b6b"
+                : post.content_type === "ANALYSIS"
+                  ? "#6b9cff"
+                  : "var(--text-secondary)",
+            padding: "2px 8px",
+            borderRadius: "4px",
+            fontSize: "0.65rem",
+            fontFamily: "var(--font-mono)",
+            marginBottom: "12px",
+            marginTop: "8px",
+            border: "1px solid currentColor",
+            letterSpacing: "0.05em",
+          }}
+        >
+          {post.content_type}
+        </span>
 
         <p className="intel-card__summary">{post.summary}</p>
 
