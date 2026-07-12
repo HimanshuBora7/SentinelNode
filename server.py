@@ -1,8 +1,16 @@
 import os
+import smtplib
+from email.message import EmailMessage
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from database import get_connection
+from pydantic import BaseModel
+class ArticleSubmission(BaseModel):
+    title: str
+    content_html: str
+    author_name: str
+    author_email: str
 
 load_dotenv()
 
@@ -127,3 +135,33 @@ def get_system_status():
     finally:
         cur.close()
         conn.close()
+@app.post("/api/articles/submit")
+def submit_article(article: ArticleSubmission):
+    admin_email = os.getenv("ADMIN_EMAIL")
+    smtp_password = os.getenv("SMTP_APP_PASSWORD")
+    if not admin_email or not smtp_password:
+        return {"error": "Email configuration missing on server."}, 500
+    msg = EmailMessage()
+    msg['Subject'] = f"NEW INTEL SUBMISSION: {article.title}"
+    msg['From'] = admin_email
+    msg['To'] = admin_email # It emails it to yourself
+    
+    # We send the raw HTML from the rich-text editor directly into the email body!
+    body = f"""
+    <h2>New Article Submission</h2>
+    <p><strong>Author:</strong> {article.author_name}</p>
+    <p><strong>Email:</strong> {article.author_email}</p>
+    <hr>
+    {article.content_html}
+    """
+    
+    msg.set_content(body, subtype='html')
+    try:
+        # This uses Gmail's secure SMTP server by default
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(admin_email, smtp_password)
+            smtp.send_message(msg)
+            
+        return {"status": "success", "message": "Article emailed to admin!"}
+    except Exception as e:
+        return {"error": str(e)}, 500

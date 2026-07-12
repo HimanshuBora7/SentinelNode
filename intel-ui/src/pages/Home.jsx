@@ -10,6 +10,7 @@ export default function Home() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState("feed"); // <-- New state!
 
   useEffect(() => {
     setLoading(true);
@@ -31,17 +32,36 @@ export default function Home() {
   return (
     <div className="home">
       <Header />
-      <FeedTabs />
+      {/* Pass the state to the tabs */}
+      <FeedTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <main className="home__content">
-        {loading && <EmptyState />}
-        {error && <EmptyState />}
-        {!loading && !error && posts.length === 0 && <EmptyState />}
-        {!loading &&
-          !error &&
-          posts.map((post) => (
-            <IntelligenceCard key={post.id} post={post} />
-          ))}
+        {/* If we are on the Editorials tab, show the coming soon message */}
+        {activeTab === "editorials" ? (
+          <div style={{ textAlign: "center", padding: "60px 20px" }}>
+            <h2
+              style={{
+                color: "var(--accent)",
+                fontFamily: "var(--font-mono)",
+                marginBottom: "16px",
+              }}
+            >
+              EDITORIALS COMING SOON
+            </h2>
+          </div>
+        ) : (
+          /* Otherwise, render the normal feed */
+          <>
+            {loading && <EmptyState />}
+            {error && <EmptyState />}
+            {!loading && !error && posts.length === 0 && <EmptyState />}
+            {!loading &&
+              !error &&
+              posts.map((post) => (
+                <IntelligenceCard key={post.id} post={post} />
+              ))}
+          </>
+        )}
       </main>
 
       <BottomNav />

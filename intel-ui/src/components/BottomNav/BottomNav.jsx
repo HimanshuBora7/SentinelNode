@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./BottomNav.css";
+import { useNavigate } from "react-router-dom";
 
 import { House, Search, Bell, SquarePen } from "lucide-react";
 const navItems = [
@@ -22,6 +23,8 @@ const navItems = [
 ];
 export default function BottomNav() {
   const [activeNav, setActiveNav] = useState("home");
+  const navigate = useNavigate();
+
   return (
     <nav className="bottom-nav">
       {navItems.map((item) => {
@@ -31,10 +34,13 @@ export default function BottomNav() {
           <button
             key={item.id}
             onClick={() => {
-              if (item.id !== "home") {
+              if (item.id === "publish") {
+                navigate("/contribute"); // Routes to your new Substack editor!
+              } else if (item.id !== "home") {
                 alert("This feature is still in development.");
               } else {
                 setActiveNav(item.id);
+                navigate("/"); // Routes back to home feed
               }
             }}
             className={

@@ -3,6 +3,9 @@
     */
 
 @import "./variables.css";
+* {
+  -webkit-tap-highlight-color: transparent;
+}
 
 /* --- Reset --- */
 *,
