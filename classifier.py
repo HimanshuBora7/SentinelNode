@@ -54,7 +54,7 @@ def pipeline_sweep_batch():
     batch = cur.fetchall()
     
     if not batch:
-        print("ℹ️ Queue clear. No pending records detected.")
+        print("ℹ Queue clear. No pending records detected.")
         cur.close()
         conn.close()
         return
@@ -152,7 +152,7 @@ def pipeline_sweep_batch():
             
     cur.close()
     conn.close()
-    print("\n🏁 Queue batch run sweep finished.")
+    print("\n Queue batch run sweep finished.")
 
 if __name__ == "__main__":
     pipeline_sweep_batch()

@@ -15,7 +15,10 @@ function timeAgo(timestamp) {
 
 export default function IntelligenceCard({ post }) {
   return (
-    <Link to={`/detail/${post.post_id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+    <Link
+      to={`/detail/${post.post_id}`}
+      style={{ textDecoration: "none", color: "inherit" }}
+    >
       <article className="intel-card">
         <h2 className="intel-card__title">{post.headline || post.summary}</h2>
 
@@ -23,6 +26,12 @@ export default function IntelligenceCard({ post }) {
 
         <div className="intel-card__meta">
           <span>@{post.account_handle}</span>
+          {post.additional_sources_count > 0 && (
+            <span className="source-badge">
+              +{post.additional_sources_count}{" "}
+              {post.additional_sources_count === 1 ? "source" : "sources"}
+            </span>
+          )}
           <span>•</span>
           <span>{timeAgo(post.timestamp)}</span>
         </div>

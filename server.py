@@ -24,28 +24,53 @@ def get_feed(category: str = None):
     cur = conn.cursor()
     try:
         if category and category.upper() != "ALL":
+            # 1. Update the category-specific query
             cur.execute("""
                 SELECT pi.id, pi.post_id, pi.account_handle, pi.category,
                        pi.importance, pi.confidence_score, pi.headline,
                        pi.summary, pi.keywords, pi.entities,
-                       rp.text AS original_text, rp.timestamp
+                       rp.text AS original_text, rp.timestamp,
+                       (SELECT COUNT(*) - 1 
+                        FROM story_cluster_members scm 
+                        JOIN story_clusters sc ON sc.id = scm.cluster_id 
+                        WHERE sc.primary_post_id = pi.post_id) as additional_sources_count
                 FROM processed_intelligence pi
                 JOIN raw_posts rp ON pi.post_id = rp.post_id
-                WHERE UPPER(pi.category) = %s
+                                WHERE UPPER(pi.category) = %s 
+                  AND pi.post_id NOT IN (
+                      SELECT scm.post_id 
+                      FROM story_cluster_members scm
+                      JOIN story_clusters sc ON sc.id = scm.cluster_id
+                      WHERE scm.post_id != sc.primary_post_id
+                  )
+
                 ORDER BY rp.timestamp DESC
                 LIMIT 20;
             """, (category.upper(),))
         else:
+            # 2. Update the default "ALL" query
             cur.execute("""
                 SELECT pi.id, pi.post_id, pi.account_handle, pi.category,
                        pi.importance, pi.confidence_score, pi.headline,
                        pi.summary, pi.keywords, pi.entities,
-                       rp.text AS original_text, rp.timestamp
+                       rp.text AS original_text, rp.timestamp,
+                       (SELECT COUNT(*) - 1 
+                        FROM story_cluster_members scm 
+                        JOIN story_clusters sc ON sc.id = scm.cluster_id 
+                        WHERE sc.primary_post_id = pi.post_id) as additional_sources_count
                 FROM processed_intelligence pi
                 JOIN raw_posts rp ON pi.post_id = rp.post_id
+                              WHERE pi.post_id NOT IN (
+                      SELECT scm.post_id 
+                      FROM story_cluster_members scm
+                      JOIN story_clusters sc ON sc.id = scm.cluster_id
+                      WHERE scm.post_id != sc.primary_post_id
+                )
+
                 ORDER BY rp.timestamp DESC
                 LIMIT 20;
             """)
+
         rows = cur.fetchall()
         # Convert datetime objects to ISO strings for JSON serialization
         for row in rows:
