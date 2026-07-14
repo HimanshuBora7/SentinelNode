@@ -14,20 +14,28 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("feed"); // <-- New state!
 
   useEffect(() => {
+    const fetchFeed = () => {
+      fetch(`/api/feed`)
+        .then((res) => {
+          if (!res.ok) throw new Error("API request failed");
+          return res.json();
+        })
+        .then((data) => {
+          setPosts(data.posts);
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+    };
+
     setLoading(true);
-    fetch(`/api/feed`)
-      .then((res) => {
-        if (!res.ok) throw new Error("API request failed");
-        return res.json();
-      })
-      .then((data) => {
-        setPosts(data.posts);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+    fetchFeed();
+
+    const intervalId = setInterval(fetchFeed, 10000); // Update feed every 10 seconds
+    
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
   }, []);
 
   return (

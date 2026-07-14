@@ -19,7 +19,7 @@ client = OpenAI(
 )
 
 # Configuration settings matching your blueprint
-PRIMARY_MODEL = "deepseek/deepseek-chat" # Toggle to "google/gemini-2.5-flash" or similar via config change
+PRIMARY_MODEL = "deepseek/deepseek-chat-v3-0324" # Toggle to "google/gemini-2.5-flash" or similar via config change
 SCHEMA_VERSION = 1
 
 def get_db_connection():
@@ -117,6 +117,7 @@ def pipeline_sweep_batch():
                     {"role": "system", "content": system_prompt + few_shot_examples},
                     {"role": "user", "content": f"Source: @{handle}\nContent: {content}"}
                 ],
+                max_tokens=1000,
                 timeout=20.0 # Strict 20 second absolute server cutoff line
             )
             
